@@ -8,6 +8,7 @@
 
 
     // You can also override the submit function for each service, which can come in handy when use a service's SDK.
+    socs.sharing.config.services.facebook.method = 'sdk';
     socs.sharing.config.services.facebook.submit = function() {
         if (typeof FB != 'undefined') {
             var props = this.getShareProps();
@@ -149,7 +150,7 @@
     config.services.facebook = {
         label: 'Facebook',
         url: 'http://www.facebook.com/sharer.php',
-        method: 'sdk',
+        method: 'popup',
         metaProps: {
             url: 'u',
             title: 't'
