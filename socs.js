@@ -51,7 +51,7 @@
         // set options from config
         utils.extend(options, config);
 
-        __.version = '0.0.1';
+        __.version = '0.0.2';
 
 
         // query DOM for anything matching options.selector
