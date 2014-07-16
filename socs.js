@@ -57,12 +57,10 @@
         // query DOM for anything matching options.selector
         // set up sharing service for each match
         var getItems = function() {
-            var mp = (options.metaElement) ? d3.select(options.metaElement) : null;
-            d3.selectAll(options.selector)
-                .each(function(){
-                    var item = d3.select(this),
-                        type = item.attr('data-social-service');
+            var mp = (options.metaElement) ? document.querySelector(options.metaElement) : null;
 
+                [].forEach.call(document.querySelectorAll(options.selector), function(item){
+                    var type = item.getAttribute('data-social-service');
 
                     if (config.services.hasOwnProperty(type)) {
 
@@ -77,12 +75,17 @@
                         items.push( o );
 
                         (function(o){
-                            o.elm.on('click',null)
-                                .on('click', function(){
-                                    d3.event.preventDefault();
-                                    o.click_();
-                                    return false;
-                                });
+                            o.elm.addEventListener('click', function(evt){
+                                if (evt.preventDefault) {
+                                    evt.preventDefault();
+                                } else {
+                                    evt.returnFalse = true;
+                                };
+
+                                o.click_();
+                                return false;
+                            });
+
                         })(o);
                     }
 
@@ -98,15 +101,15 @@
             }
 
             if (utils.empty(options.defaults.image)) {
-                options.defaults.image = (d3.select('meta[property="og:image"]').node()) ? d3.select('meta[property="og:image"]').attr("content") : "";
+                options.defaults.image = document.querySelector('meta[property="og:image"]') ? document.querySelector('meta[property="og:image"]').getAttribute("content") : "";
             }
 
             if (utils.empty(options.defaults.title)) {
-                options.defaults.title = (d3.select('meta[property="og:title"]').node()) ? d3.select('meta[property="og:title"]').attr("content") : document.title;
+                options.defaults.title = document.querySelector('meta[property="og:title"]') ? document.querySelector('meta[property="og:title"]').getAttribute("content") : document.title;
             }
 
             if (utils.empty(options.defaults.desc)) {
-                options.defaults.desc = (d3.select('meta[property="og:description"]').node()) ? d3.select('meta[property="og:description"]').attr("content") : "";
+                options.defaults.desc = document.querySelector('meta[property="og:description"]') ? document.querySelector('meta[property="og:description"]').getAttribute("content") : "";
             }
 
         };
@@ -259,7 +262,7 @@
         // string & arrays only
         empty: function(p) {
             if (typeof p === "string" || p instanceof Array) {
-                if(!p || !p.length) return true;
+                if (!p || !p.length) return true;
             }
 
             return false;
@@ -307,33 +310,43 @@
             var left = ((width / 2) - (w / 2)) + dualScreenLeft;
             var top = ((height / 3) - (h / 3)) + dualScreenTop;
 
-            var window_content = [
-            '<!DOCTYPE HTML>',
-            '<html><head>',
-            '<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></scri','pt>',
 
-            '<script type="text/javascript">',
-            'function loadShortUrl() {',
-                'd3.json("http://is.gd/create.php?format=json&url=',encodeURIComponent(urlToShorten),'", function(e,v){',
-                    'if (e) {',
-                        'shortenCB("',urlToShorten,'");',
-                    '} else {',
-                        'shortenCB(v.shorturl);',
+
+            var windowContent = [
+                '<!DOCTYPE HTML>',
+                '<html><head>',
+
+                '<script type="text/javascript">',
+                    'function loadShortUrl() {',
+                        'var request = new XMLHttpRequest();',
+                        'request.open("GET", "http://is.gd/create.php?format=json&url=',encodeURIComponent(urlToShorten),'", true);',
+                        'request.onload = function() {',
+                            'if (request.status >= 200 && request.status < 400) {',
+                                'var rsp = JSON.parse(request.responseText);',
+                                'shortenCB(rsp.shorturl);',
+                            '} else {',
+                                'shortenCB("',urlToShorten,'");',
+                            '}',
+                        '};',
+                        'request.onerror = function() {',
+                            'shortenCB("',urlToShorten,'");',
+                        '};',
+                        'request.send();',
+
                     '}',
-                '})',
-             '}',
-            'function shortenCB(u){',
-                'var shareUrl="',shareUrl,'";',
-                'shareUrl = shareUrl.replace("{url}",encodeURIComponent(u));',
-                'window.location.href = shareUrl;',
-            '}',
-            '</scri','pt>',
-            '</head>',
-            '<body onload="loadShortUrl();">',
-            '</body></html>'].join('');
+                    'function shortenCB(u){',
+                        'var shareUrl="',shareUrl,'";',
+                        'shareUrl = shareUrl.replace("{url}",encodeURIComponent(u));',
+                        'window.location.href = shareUrl;',
+                    '}',
+                '</scri','pt>',
+                '</head>',
+                '<body onload="loadShortUrl();">',
+            '</body></html>'
+            ].join('');
 
             var newWindow = window.open('', title, 'toolbar=0,status=0,height=' + h + ',width=' + w + ',scrollbars=yes,resizable=yes');
-            newWindow.document.write(window_content);
+            newWindow.document.write(windowContent);
             newWindow.document.close(); // needed for chrome and safari
 
             // Puts focus on the newWindow
@@ -344,13 +357,12 @@
 
         getShareProps: function() {
             if (!this.elm || !this.defaults) return null;
-            console.log('this.metaElement-> ', this.metaElement);
 
             var p = {};
             for (var opt in this.defaults) {
                 var dataKey = 'data-social-' + opt;
-                var el = (this.metaElement) ? this.metaElement : this.elm;
-                p[opt] = (el.attr(dataKey)) ? el.attr(dataKey) : this.defaults[opt];
+                var elm = (this.metaElement) ? this.metaElement : this.elm;
+                p[opt] = (elm.getAttribute(dataKey)) ? elm.getAttribute(dataKey) : this.defaults[opt];
             }
 
             return p;

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title>Socs Basic Example</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="../socs.js"></script>
+</head>
+<body>
+<ul class="social-controller">
+    <li><a href="#" class="social-item" data-social-service="facebook">Facebook</a></li>
+    <li><a href="#" class="social-item" data-social-service="twitter">Twitter</a></li>
+    <li><a href="#" class="social-item" data-social-service="google">Google+</a></li>
+    <li><a href="#" class="social-item" data-social-service="linkedin">LinkedIn</a></li>
+    <li><a href="#" class="social-item" data-social-service="pinterest">Pinterest</a></li>
+</ul>
+<script type="text/javascript">
+    if (socs) {
+        // set element as the master, which means
+        // all social-item services will pull data from this element's
+        // data attributes
+        socs.sharing.config.metaElement = '.social-controller';
+
+        // set Twitter method to use URL shortener service.
+        // NOTE: currently only supporting 'http://is.gd'
+        socs.sharing.config.services.twitter.method = 'popupWithShortner';
+
+        // initialize socs...
+        socs.sharing();
+    }
+
+</script>
+</body>
+</html>
