@@ -41,17 +41,17 @@
 (function(exports) {
     'use strict';
 
-    var stamen = exports.socs || (exports.socs = {});
+    var socs = exports.socs || (exports.socs = {});
 
-    stamen.sharing = function(){
-        var social = {},
+    socs.sharing = function(){
+        var __ = {},
             options = {};
         var items, first;
 
         // set options from config
         utils.extend(options, config);
 
-        social.version = '0.0.1';
+        __.version = '0.0.1';
 
 
         // query DOM for anything matching options.selector
@@ -114,7 +114,7 @@
 
         };
 
-        social.refresh = function() {
+        __.refresh = function() {
             if(!first) getMetaDefaults();
 
             items = [];
@@ -125,13 +125,13 @@
         };
 
         // ...
-        social.refresh();
+        __.refresh();
 
-        return social;
+        return __;
     };
 
 
-    var config = stamen.sharing.config = {
+    var config = socs.sharing.config = {
         selector: '.social-item',
         metaElement: null,
         defaults: {
@@ -237,7 +237,7 @@
 
 
 
-    var utils = stamen.sharing.utils = {
+    var utils = socs.sharing.utils = {
         __slice: [].slice,
         extend: function() {
             var consumer = arguments[0],
